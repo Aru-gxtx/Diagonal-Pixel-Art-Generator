@@ -4,7 +4,7 @@
 
 This project provides a dedicated tool for converting images into an optimized pixel art layout, specifically designed for creating **Clash of Clans wall art**.
 
-The idea for this project arose from the need to create complex base designs using a strictly limited number of walls. For example, at certain Town Hall levels, the number of walls available on a **44x44 tile map** is limited to **275**. Standard pixel art tools don't account for these limitations, often generating messy grids that exceed the available number of walls or appear distorted when viewed from the game's isometric perspective.
+The idea for this project arose from the need to create complex base designs using a strictly limited number of walls. For example, at certain Town Hall levels, the number of walls available on a **44x44 tile map** is limited to **275** (TH 10) wall limit. Standard pixel art tools don't account for these limitations, often generating messy grids that exceed the available number of walls or appear distorted when viewed from the game's isometric perspective.
 
 This Python script solves this problem by generating a high-precision diagonal layout that uses **exactly 275 blocks**. This ensures that the artwork fits perfectly within the game's constraints and utilizes every wall piece without waste.
 
