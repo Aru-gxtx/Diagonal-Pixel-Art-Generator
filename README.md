@@ -1,6 +1,6 @@
 # Diagonal-Pixel-Art-Generator
 
-![Canvas Preview](preview_diagonal.png)
+![Canvas Preview](Figure_5.png)
 
 This project provides a dedicated tool for converting images into an optimized pixel art layout, specifically designed for creating **Clash of Clans wall art**.
 
