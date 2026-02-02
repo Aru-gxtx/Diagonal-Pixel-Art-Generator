@@ -6,11 +6,11 @@
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 </head>
-<body>
+<body tabindex="0"> 
     <h1>Diagonal Pixel Art Generator</h1>
+    <p style="color: gray;">Click anywhere on the page, then press Ctrl+V to paste an image.</p>
     
     <input type="file" id="file-upload" accept="image/*">
-    
     <div id="plot-output"></div>
 
     <script type="py" src="./steps_viewable_diagonal_pixelart_gen.py" config="./pyscript.json"></script>
