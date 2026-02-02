@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import io
 from pyscript import display, when
 
+last_image_bytes = None
+
 def generate_final_diagonal_canvas(image_source, target_block_count=275):
     steps = {}
     try:
@@ -50,6 +52,8 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275):
         return None
 
 def run_pipeline(image_bytes):
+    global last_image_bytes
+    last_image_bytes = image_bytes
     log = document.getElementById("debug-log")
     
     try:
@@ -98,3 +102,8 @@ async def handle_upload(event):
         array_buffer = await file.arrayBuffer()
         js_array = Uint8Array.new(array_buffer)
         run_pipeline(js_array)
+
+@when("change", "#block-count")
+def on_count_change(event):
+    if last_image_bytes is not None:
+        run_pipeline(last_image_bytes)
