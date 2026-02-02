@@ -81,6 +81,9 @@ def run_pipeline(image_bytes):
 
 window.process_image_from_js = run_pipeline
 
+document.getElementById("debug-log").innerText = "System Ready. Paste away!"
+document.getElementById("debug-log").style.color = "green"
+
 @when("change", "#file-upload")
 async def handle_upload(event):
     if event.target.files.length > 0:
