@@ -1,4 +1,4 @@
-from js import document, console, window
+from js import document, console, URL, window
 import numpy as np
 from PIL import Image, ImageFilter, ImageOps
 import matplotlib.pyplot as plt
@@ -46,79 +46,74 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275):
 
         return steps
     except Exception as e:
-        console.log(f"Processing Error: {e}")
         return None
 
 def process_and_render(image_bytes):
+    log = document.getElementById("debug-log")
     try:
-        document.getElementById("debug-log").innerText = "Generating pixel art..."
+        log.innerText = "Processing..."
         steps = generate_final_diagonal_canvas(io.BytesIO(image_bytes))
         
         if steps is not None:
             document.getElementById("plot-output").innerHTML = ""
             plt.close('all')
-            
             fig = plt.figure(figsize=(16, 6))
             cols = len(steps)
             for i, (title, data) in enumerate(steps.items()):
                 plt.subplot(1, cols, i+1)
-                
                 cmap = 'gray'
                 if len(data.shape) == 3: cmap = None 
                 if 'Final' in title: cmap = 'Greys'
-
                 plt.imshow(data, cmap=cmap, aspect='equal')
                 plt.title(title)
                 plt.axis('off')
-            
             plt.tight_layout()
             display(fig, target="plot-output")
-            document.getElementById("debug-log").innerText = "Done!"
+            log.innerText = "Done!"
+        else:
+            log.innerText = "Error: Generator returned no data."
     except Exception as e:
-        document.getElementById("debug-log").innerText = f"Error: {str(e)}"
+        log.innerText = f"Error: {e}"
 
 @when("change", "#file-upload")
 async def handle_upload(event):
-    files = event.target.files
-    if files.length > 0:
-        file = files.item(0)
-        array_buffer = await file.arrayBuffer()
-        process_and_render(array_buffer.to_bytes())
+    if event.target.files.length > 0:
+        file = event.target.files.item(0)
+        js_array = await window.convertBlobToBytes(file)
+        process_and_render(bytes(js_array))
 
 @when("paste", "#paste-box")
 async def handle_paste(event):
-    event.preventDefault()
-    
+    event.preventDefault() # Block browser paste
     log = document.getElementById("debug-log")
     box = document.getElementById("paste-box")
     
-    blob = None
-    
-    if event.clipboardData.files and event.clipboardData.files.length > 0:
-        blob = event.clipboardData.files.item(0)
-    elif event.clipboardData.items and event.clipboardData.items.length > 0:
-        items = event.clipboardData.items
-        for i in range(items.length):
-            if "image" in items.item(i).type:
-                blob = items.item(i).getAsFile()
-                break
-    
-    if blob:
-        log.innerText = "Image received. Creating preview..."
+    try:
+        blob = None
+        if event.clipboardData.files and event.clipboardData.files.length > 0:
+            blob = event.clipboardData.files.item(0)
+        elif event.clipboardData.items and event.clipboardData.items.length > 0:
+            items = event.clipboardData.items
+            for i in range(items.length):
+                if "image" in items.item(i).type:
+                    blob = items.item(i).getAsFile()
+                    break
         
-        img_url = URL.createObjectURL(blob)
-        
-        box.innerHTML = ""
-        
-        new_img = document.createElement("img")
-        new_img.src = img_url
-        new_img.classList.add("preview-img") # Applies our CSS
-        
-        box.appendChild(new_img)
-        
-        array_buffer = await blob.arrayBuffer()
-        process_and_render(array_buffer.to_bytes())
-        
-    else:
-        log.innerText = "No image data found in clipboard."
-        
+        if blob:
+            img_url = URL.createObjectURL(blob)
+            box.innerHTML = ""
+            new_img = document.createElement("img")
+            new_img.src = img_url
+            new_img.classList.add("preview-img")
+            box.appendChild(new_img)
+            
+            log.innerText = "Converting..."
+            js_array = await window.convertBlobToBytes(blob)
+            
+            process_and_render(bytes(js_array))
+        else:
+            log.innerText = "No image found."
+            
+    except Exception as e:
+        log.innerText = f"Error: {e}"
+        console.log(e)
