@@ -1,93 +1,85 @@
-# Diagonal-Pixel-Art-Generator
+# Diagonal Pixel Art Generator
 
-![Canvas Preview](Figure_5.png)
+![Canvas Preview 1](README_assets/set_block_prev.png)
+![Canvas Preview 2](README_assets/result_block_prev.png)
 
-This project provides a dedicated tool for converting images into an optimized pixel art layout, specifically designed for creating **Clash of Clans wall art**.
+This project provides a **browser-based tool** for converting images into an optimized pixel art layout, specifically designed for creating **Clash of Clans wall art**.
 
-The idea for this project arose from the need to create complex base designs using a strictly limited number of walls. For example, at certain Town Hall levels, the number of walls available on a **44x44 tile map** is limited to **275** (TH 10) wall limit. Standard pixel art tools don't account for these limitations, often generating messy grids that exceed the available number of walls or appear distorted when viewed from the game's isometric perspective.
+The idea for this project arose from the need to create complex base designs using a strictly limited number of walls. For example, at certain Town Hall levels, the number of walls available on a **44x44 tile map** is limited to **275** (TH 10). Standard pixel art tools don't account for these limitations, often generating messy grids that exceed the available number of walls or appear distorted when viewed from the game's isometric perspective.
 
-This Python script solves this problem by generating a high-precision diagonal layout that uses **exactly 275 blocks**. This ensures that the artwork fits perfectly within the game's constraints and utilizes every wall piece without waste.
+Powered by **PyScript**, this tool runs Python logic directly in your browser to generate a high-precision diagonal layout that uses a **exact user-defined number of blocks**. This ensures that the artwork fits perfectly within the game's constraints and utilizes every wall piece without waste.
+
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![PyScript](https://img.shields.io/badge/PyScript-1976D2?style=for-the-badge&logo=pyscript&logoColor=white)
+![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white)
+![Pillow](https://img.shields.io/badge/Pillow-11557c?style=for-the-badge&logo=python&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-%23ffffff.svg?style=for-the-badge&logo=Matplotlib&logoColor=black)
+[![License](https://img.shields.io/github/license/Aru-gxtx/Diagonal-Pixel-Art-Generator?style=for-the-badge)](LICENSE)
 
 ## Features
 
+* **Web-Based Interface:** Run the generator directly in your browser—no Python installation required.
+* **Clipboard Support:** Paste images directly from your clipboard (Ctrl+V) for instant processing.
+* **Interactive Settings:** Real-time inputs to adjust the **Block Count** (Wall limit) and **Grid Size** (Map dimensions) without touching code.
 * **Precise Block Count:** The output is ranked based on edge strength, guaranteeing the use of exactly **275 pixels** (or any custom limit).
 * **Isometric Placement:** Automatically rotates the source image by -45° to appear upright when viewed on the diagonal game map.
 * **High-Precision Edge Detection:** Performs edge detection on the high-resolution image *before* resizing, preventing "staircase jaggedness" and loss of detail.
-* **Smart Downsampling:** Uses Lanczos resampling to accumulate line density, ensuring that even thin lines are represented in the final 44x44 grid.
-* **Waste-Free Design:** Includes a boundary clearing algorithm to prevent wasted wall pieces on the grid's perimeter.
-* **Visualizer:** The built-in Matplotlib viewer renders the grid in a diamond shape (isometric), allowing you to accurately preview how it will look in the game.
+* **Smart Downsampling:** Uses Lanczos resampling to accumulate line density, ensuring that even thin lines are represented in the final grid.
 
 ## How it Works
 
-This script follows a custom image processing pipeline to maximize detail in a small grid:
-1. **Preprocessing:** Handles transparency (RGBA) and automatically adjusts contrast.
-2. **Rotation:** Rotates the high-resolution image by 45° to match the game's isometric camera view.
-3. **Edge Detection:** Extracts smooth curves and lines from the full-size image.
-4. **Downsampling:** Reduces the edge map to a 44x44 grid. Pixel brightness represents "line density".
-5. **Selection:** Sorts all pixels by brightness and activates only the **top 275** brightest pixels.
+This tool follows a custom image processing pipeline to maximize detail in a small grid:
+
+1.  **Preprocessing:** Handles transparency (RGBA) and automatically adjusts contrast.
+2.  **Rotation:** Rotates the high-resolution image by 45° to match the game's isometric camera view.
+3.  **Edge Detection:** Extracts smooth curves and lines from the full-size image.
+4.  **Downsampling:** Reduces the edge map to a specific grid size (e.g., 44x44). Pixel brightness represents "line density".
+5.  **Selection:** Sorts all pixels by brightness and activates only the **top N** brightest pixels (where N is your wall count).
 
 ## Getting Started
 
+Because this project is built with PyScript, you do not need to install Python or libraries manually to use it.
+
 ### Prerequisites
+* A modern web browser (Chrome, Firefox, Edge).
+* An internet connection (to load PyScript and Python libraries).
 
-* Python 3.x.x
-* pip
-
-### Installation
-
-1. Clone the repository or download the script.
-  ```bash
-  git clone [https://github.com/Aru-gxtx/Diagonal-Pixel-Art-Generator.git](https://github.com/Aru-gxtx/Diagonal-Pixel-Art-Generator.git)
-  ```
-2. Navigate to the project directory.
-  ```bash
-  cd Diagonal-Pixel-Art-Generator
-  ```
-3. Install the necessary dependencies.
-  ```bash
-  pip install numpy pillow matplotlib
-  ```
+### Running the Tool
+1.  Clone the repository or download the files.
+    ```bash
+    git clone [https://github.com/Aru-gxtx/Diagonal-Pixel-Art-Generator.git](https://github.com/Aru-gxtx/Diagonal-Pixel-Art-Generator.git)
+    ```
+2.  Open the `index.html` file (or whichever HTML file you are using) directly in your browser.
+3.  Wait a few seconds for the "System Ready" message (this indicates Python has loaded).
 
 ## Usage
 
-There are two ways to run this tool: generating the final art directly or viewing the step-by-step processing pipeline.
+The web interface provides three ways to interact with the tool:
 
-### 1. Standard Generation
-Use this if you only need the final result.
+### 1. Paste Image (Recommended)
+1.  Copy any image from the web or your computer (Right Click > Copy Image).
+2.  Click the dashed **"Paste Image"** box in the tool.
+3.  Press `Ctrl+V`. The image will process instantly.
 
-1. Place your image in the project folder.
-2. Open `diagonal_pixelart_gen.py` in a text editor.
-3. Update the `input_img` variable to match your filename.
-  ```python
-  input_img = "gallegodz.png"
-  ```
-4. Run the script.
-  ```bash
-  python diagonal_pixelart_gen.py
-  ```
-5. A window displaying the final diagonal layout will appear.
+### 2. Upload File
+1.  Click the "Choose File" button.
+2.  Select an image (`.png`, `.jpg`, etc.) from your device.
 
-### 2. Displaying Processing Steps (Debugging)
-Use this if the results are not displayed correctly, or if you want to see exactly how the program is processing the image (rotation, edge detection, resizing, etc.).
+### 3. Adjust Settings
+You can modify the generation parameters in real-time:
+* **Blocks:** The total number of walls/pixels to use (e.g., 275 for TH10).
+* **Grid Size:** The size of the map square (e.g., 44 for 44x44).
 
-1. Place the image in the project folder.
-2. Open `steps_viewable_diagonal_pixelart_gen.py` in a text editor.
-3. Update the `input_img` variable to match the filename.
-  ```python
-  input_img = "gallegodz.png"
-  ```
-4. Run the script.
-  ```bash
-  python steps_viewable_diagonal_pixelart_gen.py
-  ```
-5. A dashboard will appear displaying the five stages of the image processing pipeline in sequence. ## Settings
+*Changing these numbers will automatically re-process the last image you uploaded.*
 
-If adjustments are needed to match your town hall level or grid size, modify the parameters in the function calls within either script.
+## Development
 
-```python
-# Change target_block_count to the number of available walls
-canvas = generate_final_diagonal_canvas(input_img, target_block_count=300)
-```
+If you wish to modify the underlying Python logic (`steps_viewable_diagonal_pixelart_gen.py`), note that the environment is managed by `pyscript.json`.
+
+**Key Files:**
+* `index.html`: The user interface and JavaScript glue code.
+* `steps_viewable_diagonal_pixelart_gen.py`: The core Python processing logic.
+* `pyscript.json`: Configuration for Python dependencies (Pillow, Matplotlib, Numpy).
 
 ## License
 
