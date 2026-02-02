@@ -108,3 +108,16 @@ def on_blocks_change(event):
 def on_grid_change(event):
     if last_image_bytes is not None:
         run_pipeline(last_image_bytes)
+
+window.process_image_from_js = run_pipeline
+
+@when("change", "#file-upload")
+async def handle_upload(event):
+    if event.target.files.length > 0:
+        file = event.target.files.item(0)
+        array_buffer = await file.arrayBuffer()
+        js_array = Uint8Array.new(array_buffer)
+        run_pipeline(js_array)
+
+document.getElementById("debug-log").innerText = "System Ready. Paste away!"
+document.getElementById("debug-log").style.color = "green"
