@@ -7,46 +7,58 @@
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
     
     <style>
+        body { font-family: sans-serif; padding: 20px; }
+        
         .paste-area {
-            width: 150px;
-            height: 150px;
-            border: 3px dashed #666;
-            border-radius: 10px;
-            background-color: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 200px; 
+            height: 100px; 
+            border: 4px dashed #ccc; 
+            border-radius: 12px;
+            background-color: #f9f9f9;
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
             text-align: center;
-            color: #555;
+            color: #666;
             cursor: pointer;
-            outline: none;
-            overflow: hidden; /* Just in case */
+            transition: all 0.2s;
+            outline: none; /* Removes the blue glow on Chrome */
         }
+        
         .paste-area:focus {
             border-color: #007bff;
-            background-color: #e9ecef;
+            background-color: #eef5ff;
+            box-shadow: 0 0 0 4px rgba(0,123,255,0.1);
+        }
+
+        #debug-log {
+            margin-top: 10px;
+            font-family: monospace;
+            color: crimson;
+            font-size: 0.9em;
         }
     </style>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const box = document.getElementById("paste-box");
-            box.addEventListener("paste", (event) => {
-                event.preventDefault(); // This stops the "Giant Image"
-            });
-        });
-    </script>
 </head>
 <body>
     <h1>Diagonal Pixel Art Generator</h1>
     
-    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
-        <input type="file" id="file-upload" accept="image/*">
+    <div style="display: flex; gap: 20px; align-items: start;">
+        <div>
+            <label><b>Option 1:</b> Upload File</label><br>
+            <input type="file" id="file-upload" accept="image/*" style="margin-top: 8px;">
+        </div>
         
-        <div id="paste-box" contenteditable="true" class="paste-area">
-            <p>Click here, then press <b>Ctrl+V</b></p>
+        <div>
+            <label><b>Option 2:</b> Paste Image</label><br>
+            <div id="paste-box" contenteditable="true" class="paste-area">
+                <span>Click here &<br>Press <b>Ctrl+V</b></span>
+            </div>
+            <div id="debug-log"></div>
         </div>
     </div>
+    
+    <hr style="margin: 20px 0;">
     
     <div id="plot-output"></div>
 
