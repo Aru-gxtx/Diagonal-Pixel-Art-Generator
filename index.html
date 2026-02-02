@@ -59,37 +59,49 @@
             const pasteBox = document.getElementById('paste-box');
             
             pasteBox.addEventListener('paste', async (e) => {
-                e.preventDefault(); // 1. STOP the browser from zooming/cropping
+                e.preventDefault(); // Stop browser default paste
                 
                 const log = document.getElementById('debug-log');
-                log.innerText = "Paste detected. Checking...";
+                log.innerText = "Paste detected...";
                 
                 let blob = null;
                 const items = e.clipboardData.items;
-
+    
                 for (let i = 0; i < items.length; i++) {
                     if (items[i].type.indexOf('image') !== -1) {
                         blob = items[i].getAsFile();
                         break;
                     }
                 }
-
+    
                 if (blob) {
-                    pasteBox.innerHTML = ''; // Clear text
+                    pasteBox.innerHTML = ''; 
                     const img = document.createElement('img');
                     img.src = URL.createObjectURL(blob);
-                    img.className = 'preview-img'; // Apply 'Fit-to-Box' CSS
+                    img.className = 'preview-img'; 
                     pasteBox.appendChild(img);
                     
-                    log.innerText = "Image found. Sending to Python...";
-
                     const buffer = await blob.arrayBuffer();
                     const uint8Arr = new Uint8Array(buffer);
                     
                     if (window.process_image_from_js) {
+                        log.innerText = "Processing...";
                         window.process_image_from_js(uint8Arr);
                     } else {
-                        log.innerText = "Error: Python not ready yet.";
+                        log.innerText = "Python is loading... please wait...";
+                        
+                        let attempts = 0;
+                        const checkPython = setInterval(() => {
+                            attempts++;
+                            if (window.process_image_from_js) {
+                                log.innerText = "Python loaded! Processing now...";
+                                window.process_image_from_js(uint8Arr);
+                                clearInterval(checkPython);
+                            } else if (attempts > 20) { // Stop after 10 seconds
+                                log.innerText = "Error: Python timed out. Please refresh.";
+                                clearInterval(checkPython);
+                            }
+                        }, 500); // Check every 0.5 seconds
                     }
                 } else {
                     log.innerText = "No image data found in clipboard.";
