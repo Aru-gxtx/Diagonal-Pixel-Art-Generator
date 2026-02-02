@@ -55,10 +55,12 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275):
         
 def process_and_render(image_bytes):
     try:
+        document.getElementById("plot-output").innerHTML = ""
+        
         steps = generate_final_diagonal_canvas(io.BytesIO(image_bytes))
         if steps is not None:
-            plt.clf() # Clear the previous figure to prevent memory leaks
-            plt.figure(figsize=(15, 5))
+            plt.close('all') # Proper cleanup of Matplotlib figures
+            fig = plt.figure(figsize=(15, 5))
             cols = len(steps)
             for i, (title, data) in enumerate(steps.items()):
                 plt.subplot(1, cols, i+1)
@@ -66,30 +68,30 @@ def process_and_render(image_bytes):
                 if len(data.shape) == 3: cmap = None 
                 if 'Final' in title: cmap = 'Greys'
 
-                if 'Final' in title:
-                     plt.imshow(data, cmap=cmap, vmin=0, vmax=275)
-                else:
-                     plt.imshow(data, cmap=cmap)
+                plt.imshow(data, cmap=cmap, vmin=(0 if 'Final' in title else None), vmax=(275 if 'Final' in title else None))
                 plt.title(title)
                 plt.axis('off')
+            
             plt.tight_layout()
-            display(plt.gcf(), target="plot-output", append=False)
+            display(fig, target="plot-output")
     except Exception as e:
-        console.log(f"Error in render: {str(e)}")
+        console.log(f"Render Error: {str(e)}")
+
+@when("change", "#file-upload")
+async def handle_upload(event):
+    files = event.target.files
+    if files.length > 0:
+        file = files.item(0)
+        array_buffer = await file.arrayBuffer()
+        process_and_render(array_buffer.to_bytes())
 
 @when("paste", "body")
 async def handle_paste(event):
     items = event.clipboardData.items
-    
     for i in range(items.length):
-        item = items.item(i)
-        if "image" in item.type:
-            event.preventDefault()
-            
-            blob = item.getAsFile()
+        if "image" in items.item(i).type:
+            event.preventDefault() # Stop the browser from handling the paste
+            blob = items.item(i).getAsFile()
             array_buffer = await blob.arrayBuffer()
-            image_bytes = array_buffer.to_bytes()
-            
-            process_and_render(image_bytes)
+            process_and_render(array_buffer.to_bytes())
             break
-            
