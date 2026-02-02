@@ -7,8 +7,6 @@ This project provides a **browser-based tool** for converting images into an opt
 
 The idea for this project arose from the need to create complex base designs using a strictly limited number of walls. For example, at certain Town Hall levels, the number of walls available on a **44x44 tile map** is limited to **275** (TH 10). Standard pixel art tools don't account for these limitations, often generating messy grids that exceed the available number of walls or appear distorted when viewed from the game's isometric perspective.
 
-Powered by **PyScript**, this tool runs Python logic directly in your browser to generate a high-precision diagonal layout that uses a **exact user-defined number of blocks**. This ensures that the artwork fits perfectly within the game's constraints and utilizes every wall piece without waste.
-
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![PyScript](https://img.shields.io/badge/PyScript-1976D2?style=for-the-badge&logo=pyscript&logoColor=white)
 ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white)
@@ -16,9 +14,14 @@ Powered by **PyScript**, this tool runs Python logic directly in your browser to
 ![Matplotlib](https://img.shields.io/badge/Matplotlib-%23ffffff.svg?style=for-the-badge&logo=Matplotlib&logoColor=black)
 [![License](https://img.shields.io/github/license/Aru-gxtx/Diagonal-Pixel-Art-Generator?style=for-the-badge)](LICENSE)
 
+## Live Demo
+
+You don't need to install anything!
+
+**[Click here to launch the tool](https://aru-gxtx.github.io/Diagonal-Pixel-Art-Generator/)** *(Or click the link in the "About" section on the right side of this repository)*
+
 ## Features
 
-* **Web-Based Interface:** Run the generator directly in your browser—no Python installation required.
 * **Clipboard Support:** Paste images directly from your clipboard (Ctrl+V) for instant processing.
 * **Interactive Settings:** Real-time inputs to adjust the **Block Count** (Wall limit) and **Grid Size** (Map dimensions) without touching code.
 * **Precise Block Count:** The output is ranked based on edge strength, guaranteeing the use of exactly **275 pixels** (or any custom limit).
@@ -31,28 +34,15 @@ Powered by **PyScript**, this tool runs Python logic directly in your browser to
 This tool follows a custom image processing pipeline to maximize detail in a small grid:
 
 1.  **Preprocessing:** Handles transparency (RGBA) and automatically adjusts contrast.
-2.  **Rotation:** Rotates the high-resolution image by 45° to match the game's isometric camera view.
+2.  **Rotation:** Rotates the high-resolution image by -45° to match the game's isometric camera view.
 3.  **Edge Detection:** Extracts smooth curves and lines from the full-size image.
 4.  **Downsampling:** Reduces the edge map to a specific grid size (e.g., 44x44). Pixel brightness represents "line density".
 5.  **Selection:** Sorts all pixels by brightness and activates only the **top N** brightest pixels (where N is your wall count).
 
-## Getting Started
-
-Because this project is built with PyScript, you do not need to install Python or libraries manually to use it.
-
-### Prerequisites
-* A modern web browser (Chrome, Firefox, Edge).
-* An internet connection (to load PyScript and Python libraries).
-
-### Running the Tool
-1.  Clone the repository or download the files.
-    ```bash
-    git clone [https://github.com/Aru-gxtx/Diagonal-Pixel-Art-Generator.git](https://github.com/Aru-gxtx/Diagonal-Pixel-Art-Generator.git)
-    ```
-2.  Open the `index.html` file (or whichever HTML file you are using) directly in your browser.
-3.  Wait a few seconds for the "System Ready" message (this indicates Python has loaded).
-
 ## Usage
+
+> [!TIP]
+> *For the best results, use **transparent PNGs** with the background removed. This prevents the edge detection algorithm from picking up background noise and ensures all available walls are used for your main subject.*
 
 The web interface provides three ways to interact with the tool:
 
@@ -63,7 +53,7 @@ The web interface provides three ways to interact with the tool:
 
 ### 2. Upload File
 1.  Click the "Choose File" button.
-2.  Select an image (`.png`, `.jpg`, etc.) from your device.
+2.  Select an image from your device.
 
 ### 3. Adjust Settings
 You can modify the generation parameters in real-time:
@@ -71,6 +61,16 @@ You can modify the generation parameters in real-time:
 * **Grid Size:** The size of the map square (e.g., 44 for 44x44).
 
 *Changing these numbers will automatically re-process the last image you uploaded.*
+
+## Local Installation (Optional)
+
+If you prefer to run the code locally instead of using the live link:
+
+1.  Clone the repository:
+    ```bash
+    git clone [https://github.com/Aru-gxtx/Diagonal-Pixel-Art-Generator.git](https://github.com/Aru-gxtx/Diagonal-Pixel-Art-Generator.git)
+    ```
+2.  Open `index.html` in your web browser.
 
 ## Development
 
