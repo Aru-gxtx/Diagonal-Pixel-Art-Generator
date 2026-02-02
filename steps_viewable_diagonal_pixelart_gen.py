@@ -42,7 +42,7 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275, grid_si
         top_indices = sorted_indices[-safe_block_count:]
 
         final_canvas = np.zeros_like(flat_data, dtype=np.int16)
-        final_canvas[top_indices] = target_block_count # Or any non-zero ID
+        final_canvas[top_indices] = target_block_count 
         
         final_canvas = final_canvas.reshape((grid_size, grid_size))
         steps['4. Final Pixel Art'] = final_canvas
@@ -52,7 +52,7 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275, grid_si
         console.log(f"Generator Error: {e}")
         return None
 
-last_image_bytes = None # Keep this for live updating
+last_image_bytes = None 
 
 def run_pipeline(image_bytes):
     global last_image_bytes
@@ -109,8 +109,6 @@ def on_grid_change(event):
     if last_image_bytes is not None:
         run_pipeline(last_image_bytes)
 
-window.process_image_from_js = run_pipeline
-
 @when("change", "#file-upload")
 async def handle_upload(event):
     if event.target.files.length > 0:
@@ -118,6 +116,8 @@ async def handle_upload(event):
         array_buffer = await file.arrayBuffer()
         js_array = Uint8Array.new(array_buffer)
         run_pipeline(js_array)
+
+window.process_image_from_js = run_pipeline
 
 document.getElementById("debug-log").innerText = "System Ready. Paste away!"
 document.getElementById("debug-log").style.color = "green"
