@@ -7,7 +7,7 @@ from pyscript import display, when
 
 def generate_final_diagonal_canvas(image_source, target_block_count=275):
     steps = {}
-    
+
     try:
         img = Image.open(image_source)
 
@@ -43,16 +43,16 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275):
 
         final_canvas = np.zeros_like(flat_data, dtype=np.int16)
         final_canvas[top_indices] = 275
-        
+
         final_canvas = final_canvas.reshape((44, 44))
         steps['4. Final Pixel Art'] = final_canvas
-        
+
         return steps
 
     except Exception as e:
         print(f"Error processing image: {e}")
         return None
-
+        
 def process_and_render(image_bytes):
     steps = generate_final_diagonal_canvas(io.BytesIO(image_bytes))
     if steps is not None:
@@ -63,7 +63,7 @@ def process_and_render(image_bytes):
             cmap = 'gray'
             if len(data.shape) == 3: cmap = None 
             if 'Final' in title: cmap = 'Greys'
-            
+
             if 'Final' in title:
                  plt.imshow(data, cmap=cmap, vmin=0, vmax=275)
             else:
@@ -75,22 +75,9 @@ def process_and_render(image_bytes):
 
 @when("paste", "body")
 async def handle_paste(event):
-    event.preventDefault() 
-    
     items = event.clipboardData.items
-    for item in items:
-        if "image" in item.type:
-            blob = item.getAsFile()
-            if blob:
-                array_buffer = await blob.arrayBuffer()
-                process_and_render(array_buffer.to_bytes())
-                break
-
-@when("change", "#file-upload")
-async def process_image(event):
-    file_list = event.target.files
-    if not file_list:
-        return
-    first_file = file_list.item(0)
-    array_buffer = await first_file.arrayBuffer()
-    process_and_render(array_buffer.to_bytes())
+    for i in range(len(items)):
+        if "image" in items.item(i).type:
+            blob = items.item(i).getAsFile()
+            array_buffer = await blob.arrayBuffer()
+            process_and_render(array_buffer.to_bytes())
