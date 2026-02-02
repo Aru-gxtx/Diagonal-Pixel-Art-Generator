@@ -7,27 +7,32 @@
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
     
     <style>
+        body { font-family: sans-serif; padding: 20px; }
+
         .paste-area {
-            width: 150px;       /* Fixed Width */
-            height: 150px;      /* Fixed Height */
-            border: 3px dashed #666;
+            width: 150px; 
+            height: 150px; 
+            border: 3px dashed #666; 
             border-radius: 10px;
             background-color: #f8f9fa;
-            
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            
-            overflow: hidden;   /* Cut off anything that overflows (safety net) */
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; /* Keeps the image inside */
             cursor: pointer;
             outline: none;
         }
-    
-        #paste-box img {
-            max-width: 100%;     /* Never wider than the box */
-            max-height: 100%;    /* Never taller than the box */
-            object-fit: contain; /* "Squish" it to show the FULL image without cropping */
-            display: block;      /* Removes extra text spacing */
+        
+        .paste-area:focus {
+            border-color: #007bff;
+            background-color: #eef5ff;
+        }
+
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Squishes image to fit without cropping */
+            display: block;
         }
     </style>
 </head>
@@ -37,20 +42,21 @@
     <div style="display: flex; gap: 20px; align-items: start;">
         <div>
             <label><b>Option 1:</b> Upload File</label><br>
-            <input type="file" id="file-upload" accept="image/*" style="margin-top: 8px;">
+            <input type="file" id="file-upload" accept="image/*" style="margin-top: 5px;">
         </div>
         
         <div>
             <label><b>Option 2:</b> Paste Image</label><br>
             <div id="paste-box" contenteditable="true" class="paste-area">
-                <span>Click here &<br>Press <b>Ctrl+V</b></span>
+                <span style="color: #888; text-align: center; font-size: 14px;">
+                    Click here &<br>Press <b>Ctrl+V</b>
+                </span>
             </div>
-            <div id="debug-log"></div>
+            <div id="debug-log" style="margin-top:5px; color: crimson; font-family: monospace; font-size: 0.9em;"></div>
         </div>
     </div>
     
-    <hr style="margin: 20px 0;">
-    
+    <hr>
     <div id="plot-output"></div>
 
     <script type="py" src="./steps_viewable_diagonal_pixelart_gen.py" config="./pyscript.json"></script>
