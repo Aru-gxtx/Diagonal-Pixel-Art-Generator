@@ -50,35 +50,32 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275):
         return None
 
 def process_and_render(image_bytes):
-    log = document.getElementById("debug-log")
     try:
-        log.innerText = "Processing image..."
+        document.getElementById("debug-log").innerText = "Generating pixel art..."
         steps = generate_final_diagonal_canvas(io.BytesIO(image_bytes))
         
         if steps is not None:
-            document.getElementById("plot-output").innerHTML = "" # Clear previous
+            document.getElementById("plot-output").innerHTML = ""
             plt.close('all')
             
             fig = plt.figure(figsize=(16, 6))
             cols = len(steps)
-            
             for i, (title, data) in enumerate(steps.items()):
                 plt.subplot(1, cols, i+1)
+                
                 cmap = 'gray'
-                if len(data.shape) == 2: 
-                    cmap = 'gray'
-                if 'Final' in title: 
-                    cmap = 'Greys'
+                if len(data.shape) == 3: cmap = None 
+                if 'Final' in title: cmap = 'Greys'
 
-                plt.imshow(data, cmap=cmap, aspect='equal') # aspect='equal' prevents squishing
+                plt.imshow(data, cmap=cmap, aspect='equal')
                 plt.title(title)
                 plt.axis('off')
             
             plt.tight_layout()
             display(fig, target="plot-output")
-            log.innerText = "Done!"
+            document.getElementById("debug-log").innerText = "Done!"
     except Exception as e:
-        log.innerText = f"Error: {str(e)}"
+        document.getElementById("debug-log").innerText = f"Error: {str(e)}"
 
 @when("change", "#file-upload")
 async def handle_upload(event):
@@ -90,9 +87,13 @@ async def handle_upload(event):
 
 @when("paste", "#paste-box")
 async def handle_paste(event):
+    event.preventDefault()
+    
     log = document.getElementById("debug-log")
+    box = document.getElementById("paste-box")
     
     blob = None
+    
     if event.clipboardData.files and event.clipboardData.files.length > 0:
         blob = event.clipboardData.files.item(0)
     elif event.clipboardData.items and event.clipboardData.items.length > 0:
@@ -103,11 +104,21 @@ async def handle_paste(event):
                 break
     
     if blob:
-        log.innerText = "Image detected! Processing..."
-        array_buffer = await blob.arrayBuffer()
+        log.innerText = "Image received. Creating preview..."
         
+        img_url = URL.createObjectURL(blob)
+        
+        box.innerHTML = ""
+        
+        new_img = document.createElement("img")
+        new_img.src = img_url
+        new_img.classList.add("preview-img") # Applies our CSS
+        
+        box.appendChild(new_img)
+        
+        array_buffer = await blob.arrayBuffer()
         process_and_render(array_buffer.to_bytes())
         
-        log.innerText = "Done!"
     else:
-        log.innerText = "No image found."
+        log.innerText = "No image data found in clipboard."
+        
