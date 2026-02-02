@@ -1,4 +1,4 @@
-from js import document # Import document to listen for global events
+from js import document, console, window
 import numpy as np
 from PIL import Image, ImageFilter, ImageOps
 import matplotlib.pyplot as plt
@@ -7,10 +7,8 @@ from pyscript import display, when
 
 def generate_final_diagonal_canvas(image_source, target_block_count=275):
     steps = {}
-
     try:
         img = Image.open(image_source)
-
         if img.mode == 'RGBA':
             bg = Image.new('RGB', img.size, (255, 255, 255))
             bg.paste(img, mask=img.split()[3]) 
@@ -43,62 +41,44 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275):
 
         final_canvas = np.zeros_like(flat_data, dtype=np.int16)
         final_canvas[top_indices] = 275
-
         final_canvas = final_canvas.reshape((44, 44))
         steps['4. Final Pixel Art'] = final_canvas
 
         return steps
-
     except Exception as e:
-        print(f"Error processing image: {e}")
+        console.log(f"Processing Error: {e}")
         return None
-        
+
 def process_and_render(image_bytes):
+    log = document.getElementById("debug-log")
     try:
-        document.getElementById("plot-output").innerHTML = ""
-        
+        log.innerText = "Processing image..."
         steps = generate_final_diagonal_canvas(io.BytesIO(image_bytes))
+        
         if steps is not None:
-            plt.close('all') # Proper cleanup of Matplotlib figures
-            fig = plt.figure(figsize=(15, 5))
+            document.getElementById("plot-output").innerHTML = "" # Clear previous
+            plt.close('all')
+            
+            fig = plt.figure(figsize=(16, 6))
             cols = len(steps)
+            
             for i, (title, data) in enumerate(steps.items()):
                 plt.subplot(1, cols, i+1)
                 cmap = 'gray'
-                if len(data.shape) == 3: cmap = None 
-                if 'Final' in title: cmap = 'Greys'
+                if len(data.shape) == 2: 
+                    cmap = 'gray'
+                if 'Final' in title: 
+                    cmap = 'Greys'
 
-                plt.imshow(data, cmap=cmap, vmin=(0 if 'Final' in title else None), vmax=(275 if 'Final' in title else None))
+                plt.imshow(data, cmap=cmap, aspect='equal') # aspect='equal' prevents squishing
                 plt.title(title)
                 plt.axis('off')
             
             plt.tight_layout()
             display(fig, target="plot-output")
+            log.innerText = "Done!"
     except Exception as e:
-        console.log(f"Render Error: {str(e)}")
-
-@when("paste", "#paste-box")
-async def handle_paste(event):
-    
-    blob = None
-    
-    if event.clipboardData.files.length > 0:
-        blob = event.clipboardData.files.item(0)
-        
-    elif event.clipboardData.items.length > 0:
-        items = event.clipboardData.items
-        for i in range(items.length):
-            if "image" in items.item(i).type:
-                blob = items.item(i).getAsFile()
-                break
-    
-    if blob:
-        document.getElementById("paste-box").innerText = "Processing..."
-        array_buffer = await blob.arrayBuffer()
-        process_and_render(array_buffer.to_bytes())
-        document.getElementById("paste-box").innerText = "Done! Paste another?"
-    else:
-        document.getElementById("plot-output").innerHTML = "No image detected. Try copying the image again."
+        log.innerText = f"Error: {str(e)}"
 
 @when("change", "#file-upload")
 async def handle_upload(event):
@@ -107,4 +87,33 @@ async def handle_upload(event):
         file = files.item(0)
         array_buffer = await file.arrayBuffer()
         process_and_render(array_buffer.to_bytes())
-        
+
+@when("paste", "#paste-box")
+async def handle_paste(event):
+    event.preventDefault()
+    
+    log = document.getElementById("debug-log")
+    log.innerText = "Paste Detected. Checking clipboard..."
+    
+    blob = None
+    
+    if event.clipboardData.files and event.clipboardData.files.length > 0:
+        log.innerText = "Found file in clipboard."
+        blob = event.clipboardData.files.item(0)
+    
+    elif event.clipboardData.items and event.clipboardData.items.length > 0:
+        items = event.clipboardData.items
+        for i in range(items.length):
+            item = items.item(i)
+            console.log(f"Item {i}: type={item.type}, kind={item.kind}")
+            
+            if "image" in item.type:
+                log.innerText = f"Found image: {item.type}"
+                blob = item.getAsFile()
+                break
+    
+    if blob:
+        array_buffer = await blob.arrayBuffer()
+        process_and_render(array_buffer.to_bytes())
+    else:
+        log.innerText = "No image found. Did you copy text?"
