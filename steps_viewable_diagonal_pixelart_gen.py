@@ -51,12 +51,19 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275):
 
 def run_pipeline(image_bytes):
     log = document.getElementById("debug-log")
+    
     try:
-        log.innerText = "Python Processing..."
+        count_val = document.getElementById("block-count").value
+        target_count = int(count_val) if count_val else 275
+    except:
+        target_count = 275
+
+    try:
+        log.innerText = f"Processing with {target_count} blocks..."
         
         stream = io.BytesIO(bytes(image_bytes))
         
-        steps = generate_final_diagonal_canvas(stream)
+        steps = generate_final_diagonal_canvas(stream, target_block_count=target_count)
         
         if steps:
             document.getElementById("plot-output").innerHTML = ""
