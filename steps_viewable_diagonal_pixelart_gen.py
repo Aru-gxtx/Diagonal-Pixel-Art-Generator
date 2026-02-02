@@ -79,29 +79,21 @@ def process_and_render(image_bytes):
 
 @when("paste", "#paste-box")
 async def handle_paste(event):
+    # Prevent any default browser behavior
     event.preventDefault()
 
     items = event.clipboardData.items
-    found_image = False
-
     for i in range(items.length):
         if "image" in items.item(i).type:
-            found_image = True
+            document.getElementById("plot-output").innerHTML = "Searching for edges..."
             
-            box = document.getElementById("paste-box")
-            box.innerText = "Processing Image..."
-            box.style.backgroundColor = "#d4edda" # Light green
-
             blob = items.item(i).getAsFile()
             array_buffer = await blob.arrayBuffer()
             
             process_and_render(array_buffer.to_bytes())
-            
-            box.innerText = "Success! Paste another?"
-            break
-    
-    if not found_image:
-        console.log("No image found in paste data.")
+            return # Exit after finding the first image
+
+    document.getElementById("plot-output").innerHTML = "No image found in clipboard. Please copy an image first."
 
 @when("change", "#file-upload")
 async def handle_upload(event):
