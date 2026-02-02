@@ -84,35 +84,41 @@ async def handle_upload(event):
 
 @when("paste", "#paste-box")
 async def handle_paste(event):
-    event.preventDefault() # Block browser paste
+    event.preventDefault()
+    
     log = document.getElementById("debug-log")
     box = document.getElementById("paste-box")
     
     try:
         blob = None
+        
         if event.clipboardData.files and event.clipboardData.files.length > 0:
             blob = event.clipboardData.files.item(0)
+            
         elif event.clipboardData.items and event.clipboardData.items.length > 0:
             items = event.clipboardData.items
             for i in range(items.length):
-                if "image" in items.item(i).type:
-                    blob = items.item(i).getAsFile()
+                item = items.item(i)
+                if "image" in item.type:
+                    blob = item.getAsFile()
                     break
         
         if blob:
             img_url = URL.createObjectURL(blob)
-            box.innerHTML = ""
+            box.innerHTML = "" # Clear "Click here..." text
+            
             new_img = document.createElement("img")
             new_img.src = img_url
-            new_img.classList.add("preview-img")
+            new_img.classList.add("preview-img") # <--- Applies the "Fit to Box" CSS
             box.appendChild(new_img)
             
-            log.innerText = "Converting..."
+            log.innerText = "Image found! Processing..."
+            
             js_array = await window.convertBlobToBytes(blob)
             
             process_and_render(bytes(js_array))
         else:
-            log.innerText = "No image found."
+            log.innerText = "No image found. (Try copying the image file directly)"
             
     except Exception as e:
         log.innerText = f"Error: {e}"
