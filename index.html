@@ -12,16 +12,14 @@
     <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
         <input type="file" id="file-upload" accept="image/*">
         
-        <div id="paste-box" 
-             contenteditable="true" 
-             class="paste-area">
-            <span>Click here, then press <b>Ctrl+V</b> to paste</span>
+        <div id="paste-box" tabindex="0" class="paste-area">
+            <p>Click here, then press <b>Ctrl+V</b> to paste an image</p>
         </div>
         
         <style>
             .paste-area {
-                width: 300px;
-                height: 100px;
+                width: 150px;  /* Made square */
+                height: 150px; /* Made square */
                 border: 3px dashed #666;
                 border-radius: 10px;
                 background-color: #f8f9fa;
@@ -31,14 +29,14 @@
                 text-align: center;
                 color: #555;
                 cursor: pointer;
-                overflow: hidden; /* Prevents giant images from exploding the layout */
-                transition: background-color 0.2s;
+                outline: none; /* Remove default browser focus ring */
+                transition: all 0.2s;
             }
             
             .paste-area:focus {
-                outline: none;
                 border-color: #007bff;
                 background-color: #e9ecef;
+                box-shadow: 0 0 8px rgba(0,123,255,0.3);
             }
         </style>
     </div>
