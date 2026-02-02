@@ -75,7 +75,7 @@ async def process_image(event):
             if len(data.shape) == 3: cmap = None # RGB images
             if 'Final' in title: cmap = 'Greys'
             if 'Final' in title:
-                 plt.imshow(np.flipud(data), cmap=cmap, vmin=0, vmax=275)
+                 plt.imshow(data, cmap=cmap, vmin=0, vmax=275)
             else:
                  plt.imshow(data, cmap=cmap)
                  
