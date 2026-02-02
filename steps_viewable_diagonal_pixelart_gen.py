@@ -1,3 +1,4 @@
+from js import document # Import document to listen for global events
 import numpy as np
 from PIL import Image, ImageFilter, ImageOps
 import matplotlib.pyplot as plt
@@ -52,37 +53,44 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275):
         print(f"Error processing image: {e}")
         return None
 
-@when("change", "#file-upload")
-async def process_image(event):
-    file_list = event.target.files
-    if not file_list:
-        return
-    first_file = file_list.item(0)
-    
-    array_buffer = await first_file.arrayBuffer()
-    file_bytes = array_buffer.to_bytes()
-    
-    steps = generate_final_diagonal_canvas(io.BytesIO(file_bytes))
-    
+def process_and_render(image_bytes):
+    steps = generate_final_diagonal_canvas(io.BytesIO(image_bytes))
     if steps is not None:
         plt.figure(figsize=(15, 5))
-        
         cols = len(steps)
         for i, (title, data) in enumerate(steps.items()):
             plt.subplot(1, cols, i+1)
-            
             cmap = 'gray'
-            if len(data.shape) == 3: cmap = None # RGB images
+            if len(data.shape) == 3: cmap = None 
             if 'Final' in title: cmap = 'Greys'
             
             if 'Final' in title:
                  plt.imshow(data, cmap=cmap, vmin=0, vmax=275)
             else:
                  plt.imshow(data, cmap=cmap)
-                 
             plt.title(title)
             plt.axis('off')
-
         plt.tight_layout()
-        
         display(plt.gcf(), target="plot-output", append=False)
+
+@when("paste", "body")
+async def handle_paste(event):
+    event.preventDefault() 
+    
+    items = event.clipboardData.items
+    for item in items:
+        if "image" in item.type:
+            blob = item.getAsFile()
+            if blob:
+                array_buffer = await blob.arrayBuffer()
+                process_and_render(array_buffer.to_bytes())
+                break
+
+@when("change", "#file-upload")
+async def process_image(event):
+    file_list = event.target.files
+    if not file_list:
+        return
+    first_file = file_list.item(0)
+    array_buffer = await first_file.arrayBuffer()
+    process_and_render(array_buffer.to_bytes())
