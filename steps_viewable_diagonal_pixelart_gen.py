@@ -90,30 +90,24 @@ async def handle_upload(event):
 
 @when("paste", "#paste-box")
 async def handle_paste(event):
-    event.preventDefault()
-    
     log = document.getElementById("debug-log")
-    log.innerText = "Paste Detected. Checking clipboard..."
     
     blob = None
-    
     if event.clipboardData.files and event.clipboardData.files.length > 0:
-        log.innerText = "Found file in clipboard."
         blob = event.clipboardData.files.item(0)
-    
     elif event.clipboardData.items and event.clipboardData.items.length > 0:
         items = event.clipboardData.items
         for i in range(items.length):
-            item = items.item(i)
-            console.log(f"Item {i}: type={item.type}, kind={item.kind}")
-            
-            if "image" in item.type:
-                log.innerText = f"Found image: {item.type}"
-                blob = item.getAsFile()
+            if "image" in items.item(i).type:
+                blob = items.item(i).getAsFile()
                 break
     
     if blob:
+        log.innerText = "Image detected! Processing..."
         array_buffer = await blob.arrayBuffer()
+        
         process_and_render(array_buffer.to_bytes())
+        
+        log.innerText = "Done!"
     else:
-        log.innerText = "No image found. Did you copy text?"
+        log.innerText = "No image found."
