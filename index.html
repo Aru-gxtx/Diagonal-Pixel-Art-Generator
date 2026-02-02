@@ -5,6 +5,37 @@
     <title>Diagonal Pixel Art Generator</title>
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    
+    <style>
+        .paste-area {
+            width: 150px;
+            height: 150px;
+            border: 3px dashed #666;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #555;
+            cursor: pointer;
+            outline: none;
+            overflow: hidden; /* Just in case */
+        }
+        .paste-area:focus {
+            border-color: #007bff;
+            background-color: #e9ecef;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const box = document.getElementById("paste-box");
+            box.addEventListener("paste", (event) => {
+                event.preventDefault(); // This stops the "Giant Image"
+            });
+        });
+    </script>
 </head>
 <body>
     <h1>Diagonal Pixel Art Generator</h1>
@@ -12,33 +43,9 @@
     <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
         <input type="file" id="file-upload" accept="image/*">
         
-        <div id="paste-box" tabindex="0" class="paste-area">
-            <p>Click here, then press <b>Ctrl+V</b> to paste an image</p>
+        <div id="paste-box" contenteditable="true" class="paste-area">
+            <p>Click here, then press <b>Ctrl+V</b></p>
         </div>
-        
-        <style>
-            .paste-area {
-                width: 150px;  /* Made square */
-                height: 150px; /* Made square */
-                border: 3px dashed #666;
-                border-radius: 10px;
-                background-color: #f8f9fa;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                color: #555;
-                cursor: pointer;
-                outline: none; /* Remove default browser focus ring */
-                transition: all 0.2s;
-            }
-            
-            .paste-area:focus {
-                border-color: #007bff;
-                background-color: #e9ecef;
-                box-shadow: 0 0 8px rgba(0,123,255,0.3);
-            }
-        </style>
     </div>
     
     <div id="plot-output"></div>
