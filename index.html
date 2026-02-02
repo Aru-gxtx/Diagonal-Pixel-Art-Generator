@@ -35,21 +35,26 @@
     <h1>Diagonal Pixel Art Generator</h1>
     
     <div style="display: flex; gap: 20px; align-items: start;">
-        <div>
-            <label><b>Option 1:</b> Upload File</label><br>
-            <input type="file" id="file-upload" accept="image/*" style="margin-top: 5px;">
-        </div>
-        
-        <div>
-            <label><b>Option 2:</b> Paste Image</label><br>
-            <div id="paste-box" class="paste-area" tabindex="0">
-                <span id="placeholder-text" style="color: #888; text-align: center; font-size: 14px;">
-                    Click here &<br>Press <b>Ctrl+V</b>
-                </span>
-            </div>
-            <div id="debug-log" style="margin-top:5px; color: crimson; font-family: monospace; font-size: 0.9em;"></div>
-        </div>
+    <div>
+        <label><b>Option 1:</b> Upload File</label><br>
+        <input type="file" id="file-upload" accept="image/*" style="margin-top: 5px;">
     </div>
+    
+    <div>
+        <label><b>Option 2:</b> Paste Image</label><br>
+        <div id="paste-box" class="paste-area" tabindex="0">
+            <span id="placeholder-text" style="color: #888; text-align: center; font-size: 14px;">
+                Click here &<br>Press <b>Ctrl+V</b>
+            </span>
+        </div>
+        <div id="debug-log" style="margin-top:5px; color: crimson; font-family: monospace; font-size: 0.9em;"></div>
+    </div>
+
+    <div>
+        <label><b>Option 3:</b> Blocks</label><br>
+        <input type="number" id="block-count" value="275" min="10" max="2000" style="width: 80px; margin-top: 5px; padding: 5px;">
+    </div>
+</div>
     
     <hr>
     <div id="plot-output"></div>
