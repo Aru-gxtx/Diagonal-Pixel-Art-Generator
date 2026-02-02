@@ -7,36 +7,27 @@
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
     
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        
         .paste-area {
-            width: 200px; 
-            height: 100px; 
-            border: 4px dashed #ccc; 
-            border-radius: 12px;
-            background-color: #f9f9f9;
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
-            justify-content: center; 
-            text-align: center;
-            color: #666;
+            width: 150px;       /* Fixed Width */
+            height: 150px;      /* Fixed Height */
+            border: 3px dashed #666;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            overflow: hidden;   /* Cut off anything that overflows (safety net) */
             cursor: pointer;
-            transition: all 0.2s;
-            outline: none; /* Removes the blue glow on Chrome */
+            outline: none;
         }
-        
-        .paste-area:focus {
-            border-color: #007bff;
-            background-color: #eef5ff;
-            box-shadow: 0 0 0 4px rgba(0,123,255,0.1);
-        }
-
-        #debug-log {
-            margin-top: 10px;
-            font-family: monospace;
-            color: crimson;
-            font-size: 0.9em;
+    
+        #paste-box img {
+            max-width: 100%;     /* Never wider than the box */
+            max-height: 100%;    /* Never taller than the box */
+            object-fit: contain; /* "Squish" it to show the FULL image without cropping */
+            display: block;      /* Removes extra text spacing */
         }
     </style>
 </head>
