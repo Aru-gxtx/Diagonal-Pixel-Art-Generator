@@ -1,4 +1,4 @@
-from js import document, console, URL, window
+from js import document, console, window, Uint8Array
 import numpy as np
 from PIL import Image, ImageFilter, ImageOps
 import matplotlib.pyplot as plt
@@ -46,15 +46,19 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275):
 
         return steps
     except Exception as e:
+        console.log(f"Generator Error: {e}")
         return None
 
-def process_and_render(image_bytes):
+def run_pipeline(image_bytes):
     log = document.getElementById("debug-log")
     try:
-        log.innerText = "Processing..."
-        steps = generate_final_diagonal_canvas(io.BytesIO(image_bytes))
+        log.innerText = "Python Processing..."
         
-        if steps is not None:
+        stream = io.BytesIO(bytes(image_bytes))
+        
+        steps = generate_final_diagonal_canvas(stream)
+        
+        if steps:
             document.getElementById("plot-output").innerHTML = ""
             plt.close('all')
             fig = plt.figure(figsize=(16, 6))
@@ -71,55 +75,16 @@ def process_and_render(image_bytes):
             display(fig, target="plot-output")
             log.innerText = "Done!"
         else:
-            log.innerText = "Error: Generator returned no data."
+            log.innerText = "Error during generation."
     except Exception as e:
-        log.innerText = f"Error: {e}"
+        log.innerText = f"Pipeline Error: {e}"
+
+window.process_image_from_js = run_pipeline
 
 @when("change", "#file-upload")
 async def handle_upload(event):
     if event.target.files.length > 0:
         file = event.target.files.item(0)
-        js_array = await window.convertBlobToBytes(file)
-        process_and_render(bytes(js_array))
-
-@when("paste", "#paste-box")
-async def handle_paste(event):
-    event.preventDefault()
-    
-    log = document.getElementById("debug-log")
-    box = document.getElementById("paste-box")
-    
-    try:
-        blob = None
-        
-        if event.clipboardData.files and event.clipboardData.files.length > 0:
-            blob = event.clipboardData.files.item(0)
-            
-        elif event.clipboardData.items and event.clipboardData.items.length > 0:
-            items = event.clipboardData.items
-            for i in range(items.length):
-                item = items.item(i)
-                if "image" in item.type:
-                    blob = item.getAsFile()
-                    break
-        
-        if blob:
-            img_url = URL.createObjectURL(blob)
-            box.innerHTML = "" # Clear "Click here..." text
-            
-            new_img = document.createElement("img")
-            new_img.src = img_url
-            new_img.classList.add("preview-img") # <--- Applies the "Fit to Box" CSS
-            box.appendChild(new_img)
-            
-            log.innerText = "Image found! Processing..."
-            
-            js_array = await window.convertBlobToBytes(blob)
-            
-            process_and_render(bytes(js_array))
-        else:
-            log.innerText = "No image found. (Try copying the image file directly)"
-            
-    except Exception as e:
-        log.innerText = f"Error: {e}"
-        console.log(e)
+        array_buffer = await file.arrayBuffer()
+        js_array = Uint8Array.new(array_buffer)
+        run_pipeline(js_array)
