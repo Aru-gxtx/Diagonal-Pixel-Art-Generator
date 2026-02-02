@@ -79,21 +79,26 @@ def process_and_render(image_bytes):
 
 @when("paste", "#paste-box")
 async def handle_paste(event):
-    # Prevent any default browser behavior
-    event.preventDefault()
-
-    items = event.clipboardData.items
-    for i in range(items.length):
-        if "image" in items.item(i).type:
-            document.getElementById("plot-output").innerHTML = "Searching for edges..."
-            
-            blob = items.item(i).getAsFile()
-            array_buffer = await blob.arrayBuffer()
-            
-            process_and_render(array_buffer.to_bytes())
-            return # Exit after finding the first image
-
-    document.getElementById("plot-output").innerHTML = "No image found in clipboard. Please copy an image first."
+    
+    blob = None
+    
+    if event.clipboardData.files.length > 0:
+        blob = event.clipboardData.files.item(0)
+        
+    elif event.clipboardData.items.length > 0:
+        items = event.clipboardData.items
+        for i in range(items.length):
+            if "image" in items.item(i).type:
+                blob = items.item(i).getAsFile()
+                break
+    
+    if blob:
+        document.getElementById("paste-box").innerText = "Processing..."
+        array_buffer = await blob.arrayBuffer()
+        process_and_render(array_buffer.to_bytes())
+        document.getElementById("paste-box").innerText = "Done! Paste another?"
+    else:
+        document.getElementById("plot-output").innerHTML = "No image detected. Try copying the image again."
 
 @when("change", "#file-upload")
 async def handle_upload(event):
