@@ -8,33 +8,23 @@
     
     <style>
         body { font-family: sans-serif; padding: 20px; }
-
         .paste-area {
-            width: 150px; 
-            height: 150px; 
-            border: 3px dashed #666; 
-            border-radius: 10px;
+            width: 150px; height: 150px; 
+            border: 3px dashed #666; border-radius: 10px;
             background-color: #f8f9fa;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            overflow: hidden; /* Keeps the image inside */
-            cursor: pointer;
-            outline: none;
+            display: flex; align-items: center; justify-content: center; 
+            overflow: hidden; cursor: pointer; outline: none;
         }
-        
-        .paste-area:focus {
-            border-color: #007bff;
-            background-color: #eef5ff;
-        }
-
-        .preview-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Squishes image to fit without cropping */
-            display: block;
-        }
+        .paste-area:focus { border-color: #007bff; background-color: #eef5ff; }
+        .preview-img { width: 100%; height: 100%; object-fit: contain; display: block; }
     </style>
+
+    <script>
+        window.convertBlobToBytes = async function(blob) {
+            const buffer = await blob.arrayBuffer();
+            return new Uint8Array(buffer);
+        }
+    </script>
 </head>
 <body>
     <h1>Diagonal Pixel Art Generator</h1>
