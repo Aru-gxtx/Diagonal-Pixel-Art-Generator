@@ -75,9 +75,14 @@ async def process_image(event):
             if len(data.shape) == 3: cmap = None # RGB images
             if 'Final' in title: cmap = 'Greys'
             if 'Final' in title:
-                 plt.imshow(data, cmap=cmap, vmin=0, vmax=275)
+                vis_data = (data > 0).astype(np.uint8) * 255
+                temp_img = Image.fromarray(vis_data)
+                
+                rotated_final = temp_img.rotate(45, resample=Image.NEAREST, expand=True)
+                
+                plt.imshow(rotated_final, cmap=cmap)
             else:
-                 plt.imshow(data, cmap=cmap)
+                plt.imshow(data, cmap=cmap)
                  
             plt.title(title)
             plt.axis('off')
