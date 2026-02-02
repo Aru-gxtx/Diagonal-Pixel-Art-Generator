@@ -77,6 +77,20 @@ def process_and_render(image_bytes):
     except Exception as e:
         console.log(f"Render Error: {str(e)}")
 
+@when("paste", "#paste-box")
+async def handle_paste(event):
+    event.preventDefault()
+    
+    items = event.clipboardData.items
+    for i in range(items.length):
+        if "image" in items.item(i).type:
+            blob = items.item(i).getAsFile()
+            array_buffer = await blob.arrayBuffer()
+            process_and_render(array_buffer.to_bytes())
+            
+            document.getElementById("paste-box").innerText = "Image Received!"
+            break
+
 @when("change", "#file-upload")
 async def handle_upload(event):
     files = event.target.files
@@ -84,14 +98,4 @@ async def handle_upload(event):
         file = files.item(0)
         array_buffer = await file.arrayBuffer()
         process_and_render(array_buffer.to_bytes())
-
-@when("paste", "body")
-async def handle_paste(event):
-    items = event.clipboardData.items
-    for i in range(items.length):
-        if "image" in items.item(i).type:
-            event.preventDefault() # Stop the browser from handling the paste
-            blob = items.item(i).getAsFile()
-            array_buffer = await blob.arrayBuffer()
-            process_and_render(array_buffer.to_bytes())
-            break
+        
