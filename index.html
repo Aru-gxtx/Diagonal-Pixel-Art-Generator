@@ -8,34 +8,28 @@
     
     <style>
         body { font-family: sans-serif; padding: 20px; }
+        
         .paste-area {
-            width: 150px; height: 150px; 
-            border: 3px dashed #666; border-radius: 10px;
+            width: 150px; 
+            height: 150px; 
+            border: 3px dashed #666; 
+            border-radius: 10px;
             background-color: #f8f9fa;
-            display: flex; align-items: center; justify-content: center; 
-            overflow: hidden; cursor: pointer; outline: none;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            cursor: pointer;
+            outline: none;
         }
-        .paste-area {
-        width: 150px; height: 150px; 
-        border: 3px dashed #666; 
-        display: flex; align-items: center; justify-content: center; 
-        overflow: hidden;
-    }
-
-    .preview-img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain; /* <--- This forces the whole image to show */
-        display: block;
-    }
+        
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; 
+            display: block;
+        }
     </style>
-
-    <script>
-        window.convertBlobToBytes = async function(blob) {
-            const buffer = await blob.arrayBuffer();
-            return new Uint8Array(buffer);
-        }
-    </script>
 </head>
 <body>
     <h1>Diagonal Pixel Art Generator</h1>
@@ -48,8 +42,8 @@
         
         <div>
             <label><b>Option 2:</b> Paste Image</label><br>
-            <div id="paste-box" contenteditable="true" class="paste-area">
-                <span style="color: #888; text-align: center; font-size: 14px;">
+            <div id="paste-box" class="paste-area" tabindex="0">
+                <span id="placeholder-text" style="color: #888; text-align: center; font-size: 14px;">
                     Click here &<br>Press <b>Ctrl+V</b>
                 </span>
             </div>
@@ -59,6 +53,50 @@
     
     <hr>
     <div id="plot-output"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pasteBox = document.getElementById('paste-box');
+            
+            pasteBox.addEventListener('paste', async (e) => {
+                e.preventDefault(); // 1. STOP the browser from zooming/cropping
+                
+                const log = document.getElementById('debug-log');
+                log.innerText = "Paste detected. Checking...";
+                
+                let blob = null;
+                const items = e.clipboardData.items;
+
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                        blob = items[i].getAsFile();
+                        break;
+                    }
+                }
+
+                if (blob) {
+                    pasteBox.innerHTML = ''; // Clear text
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(blob);
+                    img.className = 'preview-img'; // Apply 'Fit-to-Box' CSS
+                    pasteBox.appendChild(img);
+                    
+                    log.innerText = "Image found. Sending to Python...";
+
+                    const buffer = await blob.arrayBuffer();
+                    const uint8Arr = new Uint8Array(buffer);
+                    
+                    if (window.process_image_from_js) {
+                        window.process_image_from_js(uint8Arr);
+                    } else {
+                        log.innerText = "Error: Python not ready yet.";
+                    }
+                } else {
+                    log.innerText = "No image data found in clipboard.";
+                }
+            });
+        });
+    </script>
 
     <script type="py" src="./steps_viewable_diagonal_pixelart_gen.py" config="./pyscript.json"></script>
 </body>
