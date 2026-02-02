@@ -54,30 +54,42 @@ def generate_final_diagonal_canvas(image_source, target_block_count=275):
         return None
         
 def process_and_render(image_bytes):
-    steps = generate_final_diagonal_canvas(io.BytesIO(image_bytes))
-    if steps is not None:
-        plt.figure(figsize=(15, 5))
-        cols = len(steps)
-        for i, (title, data) in enumerate(steps.items()):
-            plt.subplot(1, cols, i+1)
-            cmap = 'gray'
-            if len(data.shape) == 3: cmap = None 
-            if 'Final' in title: cmap = 'Greys'
+    try:
+        steps = generate_final_diagonal_canvas(io.BytesIO(image_bytes))
+        if steps is not None:
+            plt.clf() # Clear the previous figure to prevent memory leaks
+            plt.figure(figsize=(15, 5))
+            cols = len(steps)
+            for i, (title, data) in enumerate(steps.items()):
+                plt.subplot(1, cols, i+1)
+                cmap = 'gray'
+                if len(data.shape) == 3: cmap = None 
+                if 'Final' in title: cmap = 'Greys'
 
-            if 'Final' in title:
-                 plt.imshow(data, cmap=cmap, vmin=0, vmax=275)
-            else:
-                 plt.imshow(data, cmap=cmap)
-            plt.title(title)
-            plt.axis('off')
-        plt.tight_layout()
-        display(plt.gcf(), target="plot-output", append=False)
+                if 'Final' in title:
+                     plt.imshow(data, cmap=cmap, vmin=0, vmax=275)
+                else:
+                     plt.imshow(data, cmap=cmap)
+                plt.title(title)
+                plt.axis('off')
+            plt.tight_layout()
+            display(plt.gcf(), target="plot-output", append=False)
+    except Exception as e:
+        console.log(f"Error in render: {str(e)}")
 
 @when("paste", "body")
 async def handle_paste(event):
     items = event.clipboardData.items
-    for i in range(len(items)):
-        if "image" in items.item(i).type:
-            blob = items.item(i).getAsFile()
+    
+    for i in range(items.length):
+        item = items.item(i)
+        if "image" in item.type:
+            event.preventDefault()
+            
+            blob = item.getAsFile()
             array_buffer = await blob.arrayBuffer()
-            process_and_render(array_buffer.to_bytes())
+            image_bytes = array_buffer.to_bytes()
+            
+            process_and_render(image_bytes)
+            break
+            
