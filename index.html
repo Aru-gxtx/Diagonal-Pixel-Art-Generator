@@ -2,65 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diagonal Pixel Art Generator</title>
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
-    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
     
-    <style>
-        body { font-family: sans-serif; padding: 20px; }
-        
-        .paste-area {
-            width: 150px; 
-            height: 150px; 
-            border: 3px dashed #666; 
-            border-radius: 10px;
-            background-color: #f8f9fa;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            overflow: hidden; 
-            cursor: pointer;
-            outline: none;
-        }
-        
-        .preview-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; 
-            display: block;
-        }
-    </style>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    
+    <link rel="stylesheet" href="styles.css">
+    
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 </head>
 <body>
+
     <h1>Diagonal Pixel Art Generator</h1>
     
-    <div style="display: flex; gap: 20px; align-items: start;">
-    <div>
-        <label><b>Option 1:</b> Upload File</label><br>
-        <input type="file" id="file-upload" accept="image/*" style="margin-top: 5px;">
-    </div>
-    
-    <div>
-        <label><b>Option 2:</b> Paste Image</label><br>
-        <div id="paste-box" class="paste-area" tabindex="0">
-            <span id="placeholder-text" style="color: #888; text-align: center; font-size: 14px;">
-                Click here &<br>Press <b>Ctrl+V</b>
-            </span>
+    <div class="controls-wrapper">
+        
+        <div class="control-column">
+            <label>Option 1: Upload File</label>
+            <input type="file" id="file-upload" accept="image/*">
         </div>
-        <div id="debug-log" style="margin-top:5px; color: crimson; font-family: monospace; font-size: 0.9em;"></div>
-    </div>
-
-    <div>
-        <label><b>Option 3:</b> Blocks</label><br>
-        <input type="number" id="block-count" value="275" min="10" max="2000" style="width: 80px; margin-top: 5px; padding: 5px;"><br>
-        <label><b>Grid Size:</b></label><br>
-        <input type="number" id="grid-size" value="44" min="20" max="200" 
-               style="width: 80px; padding: 5px;">
-        <span style="font-size: 0.8em; color: #666;">(e.g. 44 for 44x44)</span>
-    </div>
-</div>
     
-    <hr>
+        <div class="control-column">
+            <label>Option 2: Paste Image</label>
+            <div id="paste-box" class="paste-area" tabindex="0">
+                <span id="placeholder-text" class="placeholder-text">
+                    Click here &<br>Press <b>Ctrl+V</b>
+                </span>
+            </div>
+            <div id="debug-log"></div>
+        </div>
+
+        <div class="control-column">
+            <label>Option 3: Settings</label>
+            
+            <div style="margin-bottom: 15px;">
+                <label for="block-count" style="font-size: 0.9em; margin-bottom: 4px;">Total Blocks:</label>
+                <input type="number" id="block-count" value="275" min="10" max="2000">
+            </div>
+
+            <div>
+                <label for="grid-size" style="font-size: 0.9em; margin-bottom: 4px;">Grid Size (e.g. 44):</label>
+                <input type="number" id="grid-size" value="44" min="20" max="200">
+            </div>
+        </div>
+
+    </div>
+    
+    <hr style="width: 100%; border: 0; border-top: 1px solid #ddd; margin: 30px 0;">
+    
     <div id="plot-output"></div>
 
     <script>
@@ -68,7 +57,7 @@
             const pasteBox = document.getElementById('paste-box');
             
             pasteBox.addEventListener('paste', async (e) => {
-                e.preventDefault(); // Stop browser default paste
+                e.preventDefault(); 
                 
                 const log = document.getElementById('debug-log');
                 log.innerText = "Paste detected...";
@@ -93,6 +82,7 @@
                     const buffer = await blob.arrayBuffer();
                     const uint8Arr = new Uint8Array(buffer);
                     
+                    // Logic to wait for Python to load
                     if (window.process_image_from_js) {
                         log.innerText = "Processing...";
                         window.process_image_from_js(uint8Arr);
@@ -106,11 +96,11 @@
                                 log.innerText = "Python loaded! Processing now...";
                                 window.process_image_from_js(uint8Arr);
                                 clearInterval(checkPython);
-                            } else if (attempts > 20) { // Stop after 10 seconds
+                            } else if (attempts > 20) { 
                                 log.innerText = "Error: Python timed out. Please refresh.";
                                 clearInterval(checkPython);
                             }
-                        }, 500); // Check every 0.5 seconds
+                        }, 500); 
                     }
                 } else {
                     log.innerText = "No image data found in clipboard.";
